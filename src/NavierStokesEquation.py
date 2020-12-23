@@ -36,15 +36,15 @@ def time_derivative_map(velocity_map : np.array, perp_velocity_map : np.array,
                 (second_derive_map(velocity_map, delta_space, axis=axis) +  \
                  second_derive_map(velocity_map, perp_delta_space, axis = perp_axis))
     
-    variation_space = np.multiply(
-                            derive_map(velocity_map, delta_space, axis = axis), 
-                            velocity_map
-                            )
+    # variation_space = np.multiply(
+    #                         derive_map(velocity_map, delta_space, axis = axis), 
+    #                         velocity_map
+    #                         )
     
-    variation_perp_space = np.multiply(
-                                derive_map(velocity_map, perp_delta_space, axis = perp_axis),
-                                perp_velocity_map
-                                )
+    # variation_perp_space = np.multiply(
+    #                             derive_map(velocity_map, perp_delta_space, axis = perp_axis),
+    #                             perp_velocity_map
+    #                             )
 
     time_derivative = external_forces_map - \
                       grad_pressure + \
@@ -93,9 +93,6 @@ if __name__ == "__main__":
     Gx = np.fromfunction(lambda i, j: np.sin(2*np.pi/shape[0]*i), shape, dtype=float)
     Gy = np.zeros(shape)
 
-    # U = np.arange(9.0).reshape(3,3)
-
-    # dU/dx = - dV/dy
     U = gen_U(shape)
     V = gen_V(shape)
 
