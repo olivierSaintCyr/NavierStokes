@@ -36,22 +36,10 @@ def time_derivative_map(velocity_map : np.array, perp_velocity_map : np.array,
                 (second_derive_map(velocity_map, delta_space, axis=axis) +  \
                  second_derive_map(velocity_map, perp_delta_space, axis = perp_axis))
     
-    # variation_space = np.multiply(
-    #                         derive_map(velocity_map, delta_space, axis = axis), 
-    #                         velocity_map
-    #                         )
-    
-    # variation_perp_space = np.multiply(
-    #                             derive_map(velocity_map, perp_delta_space, axis = perp_axis),
-    #                             perp_velocity_map
-    #                             )
 
     time_derivative = external_forces_map - \
                       grad_pressure + \
                       diffusion
-                    #   diffusion - \
-                    #   variation_space - \
-                    #   variation_perp_space
     
     return time_derivative
 
@@ -97,24 +85,11 @@ if __name__ == "__main__":
     V = gen_V(shape)
 
     fig, ax = plt.subplots()
-    # #im = ax.imshow(derive_map(V, delta_y, axis = 0))
-    # im = ax.imshow(V)
-    # plt.show()
 
     x,y = np.meshgrid(np.linspace(0,2*np.pi,shape[0]) ,np.linspace(0,2*np.pi,shape[1]))
     ax.streamplot(x,y,U,V)
     plt.show()
 
-    # fig, ax = plt.subplots()
-    # im = ax.imshow(divergence(U,V,delta_x,delta_y))
-    # plt.show()
-
-    # fig, ax = plt.subplots()
-    # im = ax.imshow(dynamic_pressure(U,V,density))
-    # plt.show()
-
-    
-    
     for t in range(1000):
         if (t%10==0):
             print('\n')
@@ -124,31 +99,6 @@ if __name__ == "__main__":
             fig, ax = plt.subplots()
             ax.streamplot(x,y,U,V)
             plt.show()
-
-            # fig, ax = plt.subplots()
-            # im = ax.imshow(dynamic_pressure(U,V,density))
-            # plt.show()
-            # fig, ax = plt.subplots()
-            # im = ax.imshow(U)
-            # plt.show()
-
-            
-    #     print(t)
-    #     print('\n')
         
         U = time_derivative_map(U, V, P, Gx, delta_x, delta_y, density, viscosity, axis = 1) * delta_t + U
         V = time_derivative_map(V, U, P, Gy, delta_y, delta_x, density, viscosity, axis = 0) * delta_t + V
-    #     print(U)
-    #     print(V)
-    #     print('\n')
-    #     print('\n')
-
-
-
-    
-
-     
-                      
-                      
-    
-
