@@ -48,38 +48,49 @@ def time_derivative_map(velocity_map : np.array, perp_velocity_map : np.array,
 
     time_derivative = external_forces_map - \
                       grad_pressure + \
-                      diffusion - \
-                      variation_space - \
-                      variation_perp_space
+                      diffusion
+                    #   diffusion - \
+                    #   variation_space - \
+                    #   variation_perp_space
     
     return time_derivative
 
-# Need to make space contious
-def i_to_y(i : int):
-    return np.sin(np.pi/100 * i)
+def u(i : int, j : int, shape : tuple):
+    return -np.cos(2*np.pi/shape[0]*i)*np.cos(2*np.pi/shape[1]*j)
 
-def j_to_x(j : int):
-    return np.sin(np.pi/100 * j)
-
-# j = x, i = y
 def gen_U(shape : tuple):
-    return np.fromfunction(lambda i, j: j_to_x(j)*j_to_x(j), shape, dtype=float) 
+    return np.fromfunction(lambda i, j: u(i, j, shape=shape), shape, dtype=float) 
+
+def v(i : int, j : int, shape : tuple):
+    return -np.sin(2*np.pi/shape[0]*i)*np.sin(2*np.pi/shape[1]*j)
 
 def gen_V(shape : tuple):
-    return np.fromfunction(lambda i, j: -j_to_x(j)*i_to_y(i), shape, dtype=float)
+    return np.fromfunction(lambda i, j: v(i, j, shape=shape), shape, dtype=float)
 
+def dynamic_pressure(U : np.array, V : np.array, density : float):
+    return 1/2 * density * (np.square(U) + np.square(V))
+
+def divergence(U : np.array, V : np.array, delta_x : float, delta_y : float):
+    return derive_map(U, delta_space= delta_x , axis=0) + derive_map(V, delta_space= delta_y , axis=1)
+
+
+# TODO
+def correction(U : np.array, V : np.array, delta_x : float, delta_y : float):
+    U = U + divergence/2
+    V = V + divergence/2
 
 if __name__ == "__main__":
-    delta_x, delta_y = 3, 3
+    shape  = (100, 100)
+    delta_x, delta_y = 2*np.pi/shape[0], 2*np.pi/shape[1]
     delta_t = 0.01
-    viscosity = 100
+    viscosity = 0.0001
     density = 1.0
 
     shape = (100,100)
 
     P = np.zeros(shape)
 
-    Gx = np.zeros(shape)
+    Gx = np.fromfunction(lambda i, j: np.sin(2*np.pi/shape[0]*i), shape, dtype=float)
     Gy = np.zeros(shape)
 
     # U = np.arange(9.0).reshape(3,3)
@@ -89,26 +100,51 @@ if __name__ == "__main__":
     V = gen_V(shape)
 
     fig, ax = plt.subplots()
-    #im = ax.imshow(derive_map(V, delta_y, axis = 0))
-    im = ax.imshow(V)
+    # #im = ax.imshow(derive_map(V, delta_y, axis = 0))
+    # im = ax.imshow(V)
+    # plt.show()
+
+    x,y = np.meshgrid(np.linspace(0,2*np.pi,shape[0]) ,np.linspace(0,2*np.pi,shape[1]))
+    ax.streamplot(x,y,U,V)
     plt.show()
 
-    print(U)
-    print(V)
-    for t in range(9000):
-        if (t == 10 or t == 11 or t == 50):
+    # fig, ax = plt.subplots()
+    # im = ax.imshow(divergence(U,V,delta_x,delta_y))
+    # plt.show()
+
+    # fig, ax = plt.subplots()
+    # im = ax.imshow(dynamic_pressure(U,V,density))
+    # plt.show()
+
+    
+    
+    for t in range(1000):
+        if (t%10==0):
+            print('\n')
+            print(t * delta_t)
+            print('\n')
+            print(V)
             fig, ax = plt.subplots()
-            im = ax.imshow(V)
+            ax.streamplot(x,y,U,V)
             plt.show()
-        print(t)
-        print('\n')
+
+            # fig, ax = plt.subplots()
+            # im = ax.imshow(dynamic_pressure(U,V,density))
+            # plt.show()
+            # fig, ax = plt.subplots()
+            # im = ax.imshow(U)
+            # plt.show()
+
+            
+    #     print(t)
+    #     print('\n')
         
         U = time_derivative_map(U, V, P, Gx, delta_x, delta_y, density, viscosity, axis = 1) * delta_t + U
         V = time_derivative_map(V, U, P, Gy, delta_y, delta_x, density, viscosity, axis = 0) * delta_t + V
-        print(U)
-        print(V)
-        print('\n')
-        print('\n')
+    #     print(U)
+    #     print(V)
+    #     print('\n')
+    #     print('\n')
 
 
 
