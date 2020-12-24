@@ -61,12 +61,6 @@ def dynamic_pressure(U : np.array, V : np.array, density : float):
 def divergence(U : np.array, V : np.array, delta_x : float, delta_y : float):
     return derive_map(U, delta_space= delta_x , axis=0) + derive_map(V, delta_space= delta_y , axis=1)
 
-
-# TODO
-def correction(U : np.array, V : np.array, delta_x : float, delta_y : float):
-    U = U + divergence/2
-    V = V + divergence/2
-
 if __name__ == "__main__":
     shape  = (100, 100)
     delta_x, delta_y = 2*np.pi/shape[0], 2*np.pi/shape[1]
