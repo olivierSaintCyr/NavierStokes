@@ -22,6 +22,10 @@ class Fluid:
     def update_UV(self):
         self.U = NSE.time_derivative_map(self.U, self.V, self.P, self.Gx, self.delta_x, self.delta_y, self.density, self.viscosity, axis = 1) * self.delta_t + self.U
         self.V = NSE.time_derivative_map(self.V, self.U, self.P, self.Gy, self.delta_y, self.delta_x, self.density, self.viscosity, axis = 0) * self.delta_t + self.V
+    
+    def dynamic_pressure_map(self):
+        return NSE.dynamic_pressure(self.U, self.V, self.density)
+
 
 class Figure:
     def __init__(self, fluid : Fluid):
@@ -33,7 +37,7 @@ class Figure:
                                      np.linspace(0,2*np.pi,self.fluid.shape[1]))
         
         self.quiver = self.ax[0].quiver(self.x, self.y, self.fluid.U, self.fluid.V)
-        self.pressure_hm = self.ax[1].imshow(NSE.dynamic_pressure(self.fluid.U, self.fluid.V, self.fluid.density), cmap='magma')
+        self.pressure_hm = self.ax[1].imshow(fluid.dynamic_pressure_map(), cmap='magma')
 
     def update_plot(self, Q):
         self.fluid.update_UV()
